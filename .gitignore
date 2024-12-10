@@ -1,0 +1,7 @@
+.venv*
+build
+dist
+ember.egg-info
+**/.env
+**/__pycache__
+**/logs
