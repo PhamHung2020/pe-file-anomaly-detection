@@ -17,7 +17,9 @@ logger = logging.getLogger('uvicorn.error')
 
 if not os.path.exists(settings.MODEL_PATH):
     logger.error(f"Ember model {settings.MODEL_PATH} does not exist")
-lgbm_model = lgb.Booster(model_file=settings.MODEL_PATH)
+    
+if not os.path.exists(settings.UPLOADED_FILES_DIR):
+    logger.error(f"Uploaded files location {settings.UPLOADED_FILES_DIR} does not exist")
 
 unit = 'B'
 if settings.MAX_FILE_SIZE > utils.SIZE_UNIT_TABLE['GB']+1:
@@ -28,6 +30,8 @@ else:
     unit = 'KB'
 file_too_large_message = f"File too large. Size of uploaded file must be less than {utils.convert_size(settings.MAX_FILE_SIZE, in_unit='B', out_unit=unit)} {unit}"
 
+# Load the model
+lgbm_model = lgb.Booster(model_file=settings.MODEL_PATH)
 
 @app.middleware("http")
 async def validate_file_size(request: Request, call_next):
