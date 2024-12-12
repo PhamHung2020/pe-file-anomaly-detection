@@ -55,7 +55,7 @@ async def index():
 @app.post("/detect", description="Upload PE file and detect malware in it")
 async def parse(file: UploadFile = File(...)):
     extension = os.path.splitext(file.filename)[1]
-    _, path = tempfile.mkstemp(prefix='parser_', suffix=extension, dir='uploaded_file')
+    _, path = tempfile.mkstemp(prefix='parser_', suffix=extension, dir=settings.UPLOADED_FILES_DIR)
 
     with open(path, 'ab') as f:
         chunk = await file.read(1024*1024)
@@ -75,6 +75,9 @@ async def parse(file: UploadFile = File(...)):
                 }
             }
         )
+    
+    # Set strict file permissions (e.g., only readable/writable by the owner)
+    os.chmod(path, 0o600)  # rw------- (owner only)
 
     with open(path, 'rb') as f:
         file_data = f.read()
